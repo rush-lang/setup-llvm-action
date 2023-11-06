@@ -1,0 +1,42 @@
+name: Release
+
+permissions:
+  contents: read # for checkout
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'dist/**'
+      - '**.md'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to add a comment to a GitHub issue
+      pull-requests: write # to be able to comment on released pull requests
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        id: setup-node
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+        run: npm audit signatures
+
+      - name: Build
+        run: npm run build
+
+      - name: Run semantic release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release

@@ -1,0 +1,49 @@
+name: Check PR
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'dist/**'
+      - '**.md'
+
+jobs:
+  unit-test:
+    name: test
+    uses: ./.github/workflows/unit-test.yml
+
+  action-test:
+    name: test
+    needs: unit-test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        compiler: [gcc, msvc, clang]
+        llvm-version: [9, 15, latest]
+        exclude:
+          - os: windows-latest
+            compiler: clang
+          - os: windows-latest
+            compiler: gcc
+          - os: ubuntu-latest
+            compiler: clang
+          - os: ubuntu-latest
+            compiler: msvc
+          - os: macos-latest
+            compiler: msvc
+          - os: macos-latest
+            compiler: gcc
+    uses: ./.github/workflows/action-test.yml
+    with:
+      runs-on: ${{ matrix.os }}
+      compiler: ${{ matrix.compiler }}
+      llvm-version: ${{ matrix.llvm-version }}
+    secrets: inherit
+
+
+
+

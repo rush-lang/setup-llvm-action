@@ -1,0 +1,25 @@
+name: Update Version Catalog
+
+on: workflow_dispatch
+
+jobs:
+  update-version-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js 14
+        uses: actions/setup-node@v2
+        id: setup-node
+        with:
+          node-version: 14
+          cache: npm
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      - name: Update version catalog
+        run: npm run update-version-catalog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

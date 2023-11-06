@@ -1,0 +1,65 @@
+name: Setup LLVM
+description: 'Setup the LLVM build generator.'
+author: rush-lang
+inputs:
+  compiler:
+    description: 'The compiler to use for building LLVM. Defaults to the primary compiler for the platform.'
+    # options: clang, gcc, msvc
+  llvm-version:
+    description: 'The version of LLVM to setup.'
+    default: latest
+  include-prerelease:
+    description: 'Whether to include pre-releases when searching for the latest version of LLVM.'
+    default: false
+  install-prefix:
+    description: 'The path to install LLVM.'
+  build-type:
+    description: 'Configures the optmization level for the build.'
+    default: Release
+    # options: Debug, Release, RelWithDebInfo, MinSizeRel
+  build-targets:
+    description: 'Semicolon-separated list of targets to build, or all for building all targets. Case-sensitive. Defaults to all. Example: targets-to-build: "X86;PowerPC".'
+    default: X86
+    # options: all;AArch64;AMDGPU;ARM;AVR;BPF;Hexagon;Lanai;Mips;MSP430;NVPTX;PowerPC;RISCV;Sparc;SystemZ;WebAssembly;X86;XCore
+
+  build-tools:
+    description: 'Build LLVM tools. Defaults to true. Targets for building each tool are generated in any case.'
+    default: false
+  build-tests:
+    description: "Include LLVM unit tests in the 'all' build target. Defaults to true. Targets for building each unit test are generated in any case."
+    default: false
+  build-examples:
+    description: 'Adds benchmarks to the list of default targets. Defaults to false.'
+    default: false
+  build-benchmarks:
+    description: 'Build LLVM examples. Defaults to false. Targets for building each example are generated in any case.'
+    default: false
+  build-shared-libs:
+    description: 'Whether to build LLVM as shared libraries or not.'
+    default: false
+
+  enable-projects:
+    description: 'Control which projects are enabled. For example you may want to work on clang or lldb by specifying "clang;lldb".'
+    default: ''
+    # options: clang;clang-tools-extra;cross-project-tests;libc;libclc;lld;lldb;openmp;polly;pstl
+  enable-runtimes:
+    description: 'Control which runtimes are enabled. For example you may want to work on libc++ or libc++abi by specifying "libcxx;libcxxabi".'
+    default: ''
+    # options: compiler-rt;libc;libcxx;libcxxabi;libunwind;openmp
+
+  build-32-bits:
+    description: 'Build 32-bit executables and libraries on 64-bit systems. This option is available only on some 64-bit Unix systems.'
+    default: false
+  cache:
+    description: 'Whether to use a previously cached installation of LLVM or not.'
+    default: true
+outputs:
+  llvm-version:
+    description: 'The version of LLVM that was installed or restored from the cache.'
+  cache-hit:
+    description: 'A boolean value indicating whether the cache was hit or not.'
+runs:
+  using: node20
+  main: dist/setup-llvm/index.js
+  post: dist/cache-save/index.js
+  post-if: success()

@@ -1,0 +1,59 @@
+permissions:
+  contents: read # for checkout
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        type: string
+        description: 'The runner to use'
+        required: true
+        default: 'ubuntu-latest'
+        # options: [ubuntu-latest, windows-latest, macos-latest]
+      compiler:
+        type: string
+        description: 'The compiler to use'
+        required: true
+        default: 'clang'
+        # options: [msvc, clang, gcc]
+      llvm-version:
+        type: string
+        description: 'The LLVM version to use'
+        required: true
+      cache:
+        type: boolean
+        description: 'Whether to cache the LLVM build'
+        default: true
+      artifact-name:
+        type: string
+        description: 'The name of the artifact to upload'
+        required: false
+
+jobs:
+  action-test:
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        id: setup-node
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      - name: Run build
+        run: npm run build
+
+      - name: Run setup-llvm-action
+        uses: ./
+        id: setup
+        with:
+          compiler: ${{ inputs.compiler }}
+          llvm-version: ${{ inputs.llvm-version }}
+          cache: ${{ inputs.cache }}
+
