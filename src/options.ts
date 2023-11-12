@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 import * as semver from "semver";
+import VERSION_CATALOG from "./version-catalog";
 import fs from 'fs';
 
-const VERSION_CATALOG_PATH = "./version-catalog.txt";
 const DEFAULT_NIX_INSTALL_PREFIX = "/opt/llvm";
 const DEFAULT_WIN32_INSTALL_PREFIX = "C:/Program Files/LLVM";
 
@@ -103,17 +103,16 @@ export function getOptions(): Options {
 function getSpecificVersion() {
   const includePrerelease = core.getBooleanInput("include-prerelease")
   const inputVersion = core.getInput("llvm-version", { required: true });
-  const catalog = fs.readFileSync(VERSION_CATALOG_PATH, "utf-8").split("\n").map(x => x.trim());
 
   if (inputVersion === 'latest') {
-    return semver.maxSatisfying(catalog, "*", { includePrerelease: includePrerelease })!;
+    return semver.maxSatisfying(VERSION_CATALOG, "*", { includePrerelease: includePrerelease })!;
   }
 
   if (!semver.valid(inputVersion)) {
     throw new Error(`Invalid input version '${inputVersion}'.`);
   }
 
-  const maxVersion = semver.maxSatisfying(catalog, inputVersion, { includePrerelease: includePrerelease });
+  const maxVersion = semver.maxSatisfying(VERSION_CATALOG, inputVersion, { includePrerelease: includePrerelease });
   if (!maxVersion) {
     throw new Error(`No matching version found for input version '${inputVersion}'.`);
   }

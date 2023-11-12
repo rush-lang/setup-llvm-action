@@ -20,6 +20,7 @@
   "author": "rush-lang",
   "license": "MIT",
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@types/jest": "^29.5.8",
     "@types/node": "^20.9.0",
