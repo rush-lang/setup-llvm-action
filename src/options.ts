@@ -108,7 +108,7 @@ function getSpecificVersion() {
     return semver.maxSatisfying(VERSION_CATALOG, "*", { includePrerelease: includePrerelease })!;
   }
 
-  if (!semver.valid(inputVersion)) {
+  if (!semver.valid(semver.coerce(inputVersion))) {
     throw new Error(`Invalid input version '${inputVersion}'.`);
   }
 
