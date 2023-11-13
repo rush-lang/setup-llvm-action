@@ -7,6 +7,15 @@ const DEFAULT_NIX_INSTALL_PREFIX = "/opt/llvm";
 const DEFAULT_WIN32_INSTALL_PREFIX = "C:/Program Files/LLVM";
 
 const BUILD_TYPES = ["Release", "Debug", "RelWithDebInfo", "MinSizeRel"];
+const SUPPORTED_COMPILERS = [ "clang", "gcc", "msvc" ];
+
+const PLATFORM_INSTALL_PREFIX = process.platform === "win32"
+  ? DEFAULT_WIN32_INSTALL_PREFIX
+  : DEFAULT_NIX_INSTALL_PREFIX;
+
+const PLATFORM_COMPILER =
+  process.platform === "win32" ? "msvc" :
+  process.platform === "linux" ? "gcc" : "clang";
 
 const BUILD_TARGETS = [
   "all",
@@ -56,6 +65,7 @@ const LLVM_RUNTIMES = [
 ];
 
 export interface Options {
+  compiler: string;
   llvm_version: string;
   install_prefix: string;
   build_type: string;
@@ -75,10 +85,9 @@ type ValidatedInputOptions = core.InputOptions & { values?: string[] };
 
 export function getOptions(): Options {
   return {
+    compiler: getValidatedInput("compiler", { values: SUPPORTED_COMPILERS }) ?? PLATFORM_COMPILER,
     llvm_version: getSpecificVersion(),
-    install_prefix: getValidatedInput("install-prefix") ?? process.platform === "win32"
-      ? DEFAULT_WIN32_INSTALL_PREFIX
-      : DEFAULT_NIX_INSTALL_PREFIX,
+    install_prefix: getValidatedInput("install-prefix") ?? PLATFORM_INSTALL_PREFIX,
     build_type: getValidatedInput("build-type", { values: BUILD_TYPES }) ?? "Release",
     build_targets: getValidatedInput("build-targets", {
       values: BUILD_TARGETS,
