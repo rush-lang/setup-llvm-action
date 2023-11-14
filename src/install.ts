@@ -1,3 +1,4 @@
+import * as os from "os";
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import { Options } from "./options";
@@ -31,17 +32,24 @@ export async function install(options: Options): Promise<void> {
   const buildDir = core.toPlatformPath(`${srcDir}/build`);
 
   let exit = 0;
-  core.info(`Building LLVM ${options.llvm_version}...`);
+  core.info(`Generating build configuration for LLVM ${options.llvm_version}...`);
   exit = await exec.exec("cmake", ["-B", buildDir, "-S", srcDir, ...getBuildArgs(options)]);
 
   if (exit !== 0) {
     throw new Error("Failed to configure LLVM build.");
   }
 
+  const numberOfCores = typeof os.availableParallelism === "function"
+    ? os.availableParallelism()
+    : os.cpus().length;
+
+  core.info(`Building LLVM ${options.llvm_version}...`);
+  core.info(`Using ${numberOfCores} available cores...`);
   exit = await exec.exec("cmake", [
     "--build", buildDir,
     "--target", "install",
-    "--config", options.build_type
+    "--config", options.build_type,
+    "--parallel", numberOfCores.toString(),
   ]);
 
   if (exit !== 0) {
