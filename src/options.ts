@@ -67,6 +67,7 @@ const LLVM_RUNTIMES = [
 export interface Options {
   compiler: string;
   llvm_version: string;
+  cache_prefix: string;
   install_prefix: string;
   build_type: string;
   build_targets?: string;
@@ -87,6 +88,7 @@ export function getOptions(): Options {
   return {
     compiler: getValidatedInput("compiler", { values: SUPPORTED_COMPILERS }) ?? PLATFORM_COMPILER,
     llvm_version: getSpecificVersion(),
+    cache_prefix: getValidatedInput("cache-prefix") ?? process.env.GITHUB_REPOSITORY ?? "setup-llvm-action",
     install_prefix: getValidatedInput("install-prefix") ?? PLATFORM_INSTALL_PREFIX,
     build_type: getValidatedInput("build-type", { values: BUILD_TYPES }) ?? "Release",
     build_targets: getValidatedInput("build-targets", {

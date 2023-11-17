@@ -13,6 +13,8 @@ inputs:
     default: false
   install-prefix:
     description: 'The path to install LLVM.'
+  cache-prefix:
+    description: 'The prefix given to the cache key.'
   build-type:
     description: 'Configures the optmization level for the build.'
     default: Release

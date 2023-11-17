@@ -5,6 +5,7 @@ const excludedOptions = [
   "cache",
   "compiler",
   // "install-prefix",
+  "cache-prefix",
   "include-prerelease"
 ];
 
