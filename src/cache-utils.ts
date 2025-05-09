@@ -3,10 +3,7 @@ import * as crypto from "crypto";
 
 const excludedOptions = [
   "cache",
-  "compiler",
-  // "install-prefix",
   "cache-prefix",
-  "include-prerelease"
 ];
 
 export function getCacheKey(options: Options) {
@@ -20,5 +17,5 @@ export function getCacheKey(options: Options) {
     .update(optionsString)
     .digest("hex");
 
-  return `rush-lang/setup-llvm-action-${process.platform}-${options.compiler}-${cacheKey}`;
+  return `${options.cache_prefix}-${cacheKey}`;
 }

@@ -45,7 +45,9 @@ export async function install(options: Options): Promise<void> {
 
   core.info(`Building LLVM ${options.llvm_version}...`);
   core.info(`Using ${numberOfCores} available cores...`);
-  exit = await exec.exec("cmake", [
+
+  const command = process.platform === "win32" ? "cmake" : "sudo cmake";
+  exit = await exec.exec(command, [
     "--build", buildDir,
     "--target", "install",
     "--config", options.build_type,

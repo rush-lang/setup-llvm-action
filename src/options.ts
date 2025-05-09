@@ -85,10 +85,13 @@ export interface Options {
 type ValidatedInputOptions = core.InputOptions & { values?: string[] };
 
 export function getOptions(): Options {
+  const compiler = getValidatedInput("compiler", { values: SUPPORTED_COMPILERS }) ?? PLATFORM_COMPILER;
+  const buildTargets = getValidatedInput("build-targets", { values: BUILD_TARGETS });
+  const defaultCachePrefix = `${process.env.GITHUB_REPOSITORY ?? "setup-llvm-action"}-${getPlatform()}-${compiler}-${buildTargets?.toLowerCase().split(";").join("-")}`
   return {
-    compiler: getValidatedInput("compiler", { values: SUPPORTED_COMPILERS }) ?? PLATFORM_COMPILER,
+    compiler,
     llvm_version: getSpecificVersion(),
-    cache_prefix: getValidatedInput("cache-prefix") ?? process.env.GITHUB_REPOSITORY ?? "setup-llvm-action",
+    cache_prefix: getValidatedInput("cache-prefix") ?? defaultCachePrefix,
     install_prefix: getValidatedInput("install-prefix") ?? PLATFORM_INSTALL_PREFIX,
     build_type: getValidatedInput("build-type", { values: BUILD_TYPES }) ?? "Release",
     build_targets: getValidatedInput("build-targets", {
@@ -108,6 +111,12 @@ export function getOptions(): Options {
     build_32_bits: core.getBooleanInput("build-32-bits"),
     cache: core.getBooleanInput("cache"),
   };
+}
+
+function getPlatform() {
+  return process.platform !== "darwin"
+    ? process.platform
+    : "macos";
 }
 
 /** Gets a specific version */
